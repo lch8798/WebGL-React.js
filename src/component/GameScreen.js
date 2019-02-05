@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 const key = {
     LEFT:  37,
@@ -18,14 +18,18 @@ class GameScreen extends Component {
             gameScreen: {
                 width: 750,
                 height: 375
-            }
+            },
+            gameFrame: 30,
+            gravity: 2
         }
         this.box = {
             width: 10,
             height: 10,
             x: 10,
             y: 10,
-            speed: 0.5
+            speed: 1,
+            jump: 20,
+            jumping: false
         }
         this.keyPress = {
             left: false,
@@ -35,7 +39,7 @@ class GameScreen extends Component {
             space: false
         }
 
-        setTimeout(this.initGameScreen, 1000); // 게임 스크린 딜레이 주기
+        setTimeout(this.initGameScreen, 1000); // gameScreen delay
     }
 
     async componentDidMount() {
@@ -49,7 +53,10 @@ class GameScreen extends Component {
             if(e.keyCode === key.RIGHT) t.keyPress.right = true;
             if(e.keyCode === key.UP) t.keyPress.up = true;
             if(e.keyCode === key.DOWN) t.keyPress.down = true;
-            if(e.keyCode === key.SPACE) t.keyPress.space = true;
+            if(e.keyCode === key.SPACE && !t.keyPress.space) {
+                t.keyPress.space = true;
+                t.box.jumping = true;
+            }
         }
 
         window.onkeyup = function(e) {
@@ -57,7 +64,6 @@ class GameScreen extends Component {
             if(e.keyCode === key.RIGHT) t.keyPress.right = false;
             if(e.keyCode === key.UP) t.keyPress.up = false;
             if(e.keyCode === key.DOWN) t.keyPress.down = false;
-            if(e.keyCode === key.SPACE) t.keyPress.space = false;
         }
         
 
@@ -65,14 +71,28 @@ class GameScreen extends Component {
         setInterval(function() {
             t.update();
             t.draw();
-        }, 10);
+        }, 1000/this.state.gameFrame); // frame
     }
 
     update = () => {
+        const t = this;
+
         if(this.keyPress.left == true) this.box.x -= this.box.speed;
         if(this.keyPress.right == true) this.box.x += this.box.speed;
-        if(this.keyPress.up == true) this.box.y -= this.box.speed;
-        if(this.keyPress.down == true) this.box.y += this.box.speed;
+        //if(this.keyPress.up == true) this.box.y -= this.box.speed;
+        //if(this.keyPress.down == true) this.box.y += this.box.speed;
+        if(this.keyPress.space == true) {
+
+            if(this.box.y <= 100 - this.box.jump) { // 점프력 만큼 올라갔으면 점핑 해제
+                this.box.jumping = false;
+            }
+
+            if(this.box.jumping) { // 점핑
+                this.box.y -= this.box.speed * 5;
+            }
+
+            if(this.box.y >= 100) this.keyPress.space = false; // 땅에 닿으면 점프 활성화
+        }
     }
 
     draw = () => {
@@ -89,6 +109,11 @@ class GameScreen extends Component {
         this.state.ctx.fillStyle = "green";
         this.state.ctx.fill();
         this.state.ctx.closePath();
+
+        if(this.box.y < 100) { // gravity
+            this.box.y += t.state.gravity;
+        } else {
+        }
     }
 
     

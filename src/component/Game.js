@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import GameScreen from './GameScreen';
+import WebGL from './WebGL';
 
 
 class Game extends Component {
@@ -14,7 +15,8 @@ class Game extends Component {
     render() {
       return (
         <div className="game">
-          <GameScreen></GameScreen>
+          {/*<GameScreen></GameScreen>*/}
+          <WebGL></WebGL>
         </div>
       )
     }
